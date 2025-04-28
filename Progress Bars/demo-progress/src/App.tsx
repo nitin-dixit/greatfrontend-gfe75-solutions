@@ -1,46 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { ProgressBar } from "./ProgressBar";
 
-interface ProgressBarProps {
-  progress: number;
-}
-
-const ProgressBar = ({ progress }: ProgressBarProps) => {
-  const [fillWidth, setFillWidth] = useState(0);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setFillWidth(progress);
-    }, 100);
-    return () => clearTimeout(timeout);
-  }, [progress]);
-
-  return (
-    <div className="bar-container">
-      <div
-        className="bar-contents bar-contents-filled"
-        style={{
-          width: `${fillWidth}%`, // Use direct width control
-          transition: "width 2s ease", // Add smooth transition for width change
-        }}
-      ></div>
-      <span className="progress-label">{progress}%</span>
-    </div>
-  );
-};
+type Bar = { id: string; progress: number; animating: boolean };
 
 export default function App() {
-  const [bars, setBars] = useState<number[]>([]);
+  const [bars, setBars] = useState<Bar[]>([]);
 
   const handleClick = () => {
-    const progress = Math.floor(Math.random() * 101);
-    setBars((b) => [...b, progress]);
+    const progress = 100;
+    setBars((b) => [
+      ...b,
+      { id: crypto.randomUUID(), progress, animating: true },
+    ]);
   };
+
+  //handler to mark a bar as done animating
+  const handleBarComplete = (id: string) => {
+    setBars((bars) =>
+      bars.map((bar) => (bar.id === id ? { ...bar, animating: false } : bar))
+    );
+  };
+
+  //disable button if any bar is animating
+  const isAnyAnimating = bars.some((bar) => bar.animating);
 
   return (
     <div>
-      <button onClick={handleClick}>Add</button>
-      {bars.map((progress, index) => (
-        <ProgressBar key={index} progress={progress} />
+      <button onClick={handleClick} disabled={isAnyAnimating}>
+        Add
+      </button>
+      {bars.map((bar) => (
+        <ProgressBar
+          key={bar.id}
+          progress={bar.progress}
+          onComplete={() => handleBarComplete(bar.id)}
+        />
       ))}
     </div>
   );
