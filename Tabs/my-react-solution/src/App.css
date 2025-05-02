@@ -1,0 +1,17 @@
+.tabRow {
+  margin-inline: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.tabBody {
+  margin-inline: 1rem;
+  padding: 0.5rem;
+  border: 1px solid black;
+}
+
+.active {
+  background-color: green;
+  color: white;
+}
